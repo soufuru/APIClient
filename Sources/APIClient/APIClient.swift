@@ -1,20 +1,20 @@
 import Foundation
 import os
 
-enum HTTPMethod: String {
+public enum HTTPMethod: String {
     case get
     case post
     case put
     case delete
 }
 
-protocol URLSessionProtocol {
+public protocol URLSessionProtocol {
     func data(for request: URLRequest, delegate: (any URLSessionTaskDelegate)?) async throws -> (Data, URLResponse)
 }
 
 extension URLSession: URLSessionProtocol {}
 
-protocol APIClientProtocol {
+public protocol APIClientProtocol {
     associatedtype T: Codable
     
     var urlString: String { get }
@@ -27,7 +27,7 @@ protocol APIClientProtocol {
     func perform() async -> T?
 }
 
-extension APIClientProtocol {
+public extension APIClientProtocol {
     var strategy: JSONDecoder.KeyDecodingStrategy { .convertFromSnakeCase }
     var urlSession: URLSessionProtocol { URLSession.shared }
     
