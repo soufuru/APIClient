@@ -8,18 +8,28 @@ enum HTTPMethod: String {
     case delete
 }
 
+protocol URLSessionProtocol {
+    func data(for request: URLRequest, delegate: (any URLSessionTaskDelegate)?) async throws -> (Data, URLResponse)
+}
+
+extension URLSession: URLSessionProtocol {}
+
 protocol APIClientProtocol {
     associatedtype T: Codable
     
     var urlString: String { get }
     var httpMethod: HTTPMethod { get }
     var parameters: [String: String]? { get }
+    var strategy: JSONDecoder.KeyDecodingStrategy { get }
+    
+    var urlSession: URLSessionProtocol { get }
     
     func perform() async -> T?
 }
 
 extension APIClientProtocol {
-    
+    var strategy: JSONDecoder.KeyDecodingStrategy { .convertFromSnakeCase }
+    var urlSession: URLSessionProtocol { URLSession.shared }
     
     func perform() async -> T? {
         guard let url = URL(string: urlString) else { return nil }
@@ -31,10 +41,10 @@ extension APIClientProtocol {
         }
         
         do {
-            let (data, _) = try await URLSession.shared.data(for: urlRequest)
+            let (data, _) = try await urlSession.data(for: urlRequest, delegate: nil)
             
             let decoder = JSONDecoder()
-            decoder.keyDecodingStrategy = .convertFromSnakeCase
+            decoder.keyDecodingStrategy = strategy
             
             return try decoder.decode(T.self, from: data)
         } catch {
