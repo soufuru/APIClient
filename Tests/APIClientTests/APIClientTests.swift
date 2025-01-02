@@ -7,6 +7,7 @@ struct APIClientTests {
     func perform() async {
         let subject = APIClientProtocolImpl(
             urlString: "https://hoge.com",
+            path: "/fuga",
             httpMethod: .get,
             parameters: ["Authorization": "Bearer token"],
             urlSession: URLSessionMock()
@@ -24,6 +25,7 @@ struct APIClientTests {
     func error() async {
         let subject = APIClientProtocolImpl(
             urlString: "https://hoge.com",
+            path: "/fuga",
             httpMethod: .get,
             parameters: ["Authorization": "Bearer token"],
             urlSession: URLSessionErrorMock()
@@ -46,6 +48,7 @@ struct APIClientProtocolImpl: APIClientProtocol {
     typealias T = Response
     
     let urlString: String
+    let path: String?
     let httpMethod: APIClient.HTTPMethod
     let parameters: [String : String]?
     let urlSession: any APIClient.URLSessionProtocol

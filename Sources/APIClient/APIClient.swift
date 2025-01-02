@@ -18,6 +18,7 @@ public protocol APIClientProtocol {
     associatedtype T: Codable
     
     var urlString: String { get }
+    var path: String? { get }
     var httpMethod: HTTPMethod { get }
     var parameters: [String: String]? { get }
     var strategy: JSONDecoder.KeyDecodingStrategy { get }
@@ -30,9 +31,10 @@ public protocol APIClientProtocol {
 public extension APIClientProtocol {
     var strategy: JSONDecoder.KeyDecodingStrategy { .convertFromSnakeCase }
     var urlSession: URLSessionProtocol { URLSession.shared }
+    var path: String? { nil }
     
     func perform() async -> T? {
-        guard let url = URL(string: urlString) else { return nil }
+        guard let url = URL(string: urlString + (path ?? "")) else { return nil }
         
         var urlRequest = URLRequest(url: url)
         urlRequest.httpMethod = httpMethod.rawValue
