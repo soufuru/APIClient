@@ -9,7 +9,7 @@ struct APIClientTests {
             urlString: "https://hoge.com",
             path: "/fuga",
             httpMethod: .get,
-            parameters: ["Authorization": "Bearer token"],
+            httpHeaders: ["Authorization": "Bearer token"],
             urlSession: URLSessionMock()
         )
         
@@ -27,7 +27,7 @@ struct APIClientTests {
             urlString: "https://hoge.com",
             path: "/fuga",
             httpMethod: .get,
-            parameters: ["Authorization": "Bearer token"],
+            httpHeaders: ["Authorization": "Bearer token"],
             urlSession: URLSessionErrorMock()
         )
         
@@ -50,7 +50,7 @@ struct APIClientProtocolImpl: APIClientProtocol {
     let urlString: String
     let path: String?
     let httpMethod: APIClient.HTTPMethod
-    let parameters: [String : String]?
+    let httpHeaders: [String : String]?
     let urlSession: any APIClient.URLSessionProtocol
 }
 

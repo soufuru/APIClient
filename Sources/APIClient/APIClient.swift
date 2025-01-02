@@ -20,7 +20,7 @@ public protocol APIClientProtocol {
     var urlString: String { get }
     var path: String? { get }
     var httpMethod: HTTPMethod { get }
-    var parameters: [String: String]? { get }
+    var httpHeaders: [String: String]? { get }
     var strategy: JSONDecoder.KeyDecodingStrategy { get }
     
     var urlSession: URLSessionProtocol { get }
@@ -38,7 +38,7 @@ public extension APIClientProtocol {
         
         var urlRequest = URLRequest(url: url)
         urlRequest.httpMethod = httpMethod.rawValue
-        parameters?.forEach { key, value in
+        httpHeaders?.forEach { key, value in
             urlRequest.addValue(key, forHTTPHeaderField: value)
         }
         
