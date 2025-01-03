@@ -19,6 +19,7 @@ public protocol APIClientProtocol {
     
     var urlString: String { get }
     var path: String? { get }
+    var params: [String: String] { get }
     var httpMethod: HTTPMethod { get }
     var httpHeaders: [String: String]? { get }
     var strategy: JSONDecoder.KeyDecodingStrategy { get }
@@ -32,9 +33,14 @@ public extension APIClientProtocol {
     var strategy: JSONDecoder.KeyDecodingStrategy { .convertFromSnakeCase }
     var urlSession: URLSessionProtocol { URLSession.shared }
     var path: String? { nil }
+    var params: [String: String] { [:] }
     
     func perform() async -> T? {
-        guard let url = URL(string: urlString + (path ?? "")) else { return nil }
+        let param = params.map { "\($0.key)=\($0.value)" }.joined(separator: "&")
+        guard let url = URL(string: urlString + (path ?? "") + param) else {
+            Logger().error("Invalid URL: \(urlString), \(path ?? ""), \(param)")
+            return nil
+        }
         
         var urlRequest = URLRequest(url: url)
         urlRequest.httpMethod = httpMethod.rawValue

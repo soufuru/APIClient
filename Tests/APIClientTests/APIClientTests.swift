@@ -5,13 +5,7 @@ import Foundation
 struct APIClientTests {
     @Test
     func perform() async {
-        let subject = APIClientProtocolImpl(
-            urlString: "https://hoge.com",
-            path: "/fuga",
-            httpMethod: .get,
-            httpHeaders: ["Authorization": "Bearer token"],
-            urlSession: URLSessionMock()
-        )
+        let subject = APIClientProtocolImpl()
         
         
         let response = await subject.perform()
@@ -23,13 +17,18 @@ struct APIClientTests {
     
     @Test
     func error() async {
-        let subject = APIClientProtocolImpl(
-            urlString: "https://hoge.com",
-            path: "/fuga",
-            httpMethod: .get,
-            httpHeaders: ["Authorization": "Bearer token"],
-            urlSession: URLSessionErrorMock()
-        )
+        let subject = APIClientProtocolImpl(urlSession: URLSessionErrorMock())
+        
+        
+        let response = await subject.perform()
+        
+        
+        #expect(response == nil)
+    }
+    
+    @Test
+    func error_invalid_url() async {
+        let subject = APIClientProtocolImpl(urlString: "127.0.0.1:8000/test")
         
         
         let response = await subject.perform()
@@ -49,8 +48,24 @@ struct APIClientProtocolImpl: APIClientProtocol {
     
     let urlString: String
     let path: String?
+    let params: [String: String]?
     let httpMethod: APIClient.HTTPMethod
     let httpHeaders: [String : String]?
     let urlSession: any APIClient.URLSessionProtocol
+    
+    init(
+        urlString: String = "https://hoge.com",
+        path: String? = "/fuga",
+        params: [String : String]? = ["key" : "value"],
+        httpMethod: APIClient.HTTPMethod = .get,
+        httpHeaders: [String : String]? = ["Authorization": "Bearer token"],
+        urlSession: any APIClient.URLSessionProtocol = URLSessionMock()
+    ) {
+        self.urlString = urlString
+        self.path = path
+        self.params = params
+        self.httpMethod = httpMethod
+        self.httpHeaders = httpHeaders
+        self.urlSession = urlSession
+    }
 }
-
